@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local/template.schema.json",
+  "title": "Video template configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "name",
+    "duration_sec",
+    "fps",
+    "width",
+    "height",
+    "composition",
+    "slots",
+    "scenes"
+  ],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "name": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "duration_sec": { "type": "integer", "minimum": 5, "maximum": 90 },
+    "fps": { "type": "integer", "enum": [24, 25, 30] },
+    "width": { "type": "integer", "minimum": 480 },
+    "height": { "type": "integer", "minimum": 480 },
+    "composition": {
+      "type": "string",
+      "description": "Remotion composition id. Must exist in apps/renderer."
+    },
+    "default_music_id": { "type": "string", "format": "uuid" },
+    "slots": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/slot" }
+    },
+    "scenes": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/scene" }
+    }
+  },
+  "$defs": {
+    "slot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "required"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z][a-z0-9_]{1,31}$" },
+        "type": { "type": "string", "enum": ["image", "video", "text", "audio"] },
+        "required": { "type": "boolean" },
+        "label": { "type": "object", "additionalProperties": { "type": "string" } },
+        "max_mb": { "type": "number", "minimum": 0.5, "maximum": 50 },
+        "max_chars": { "type": "integer", "minimum": 1, "maximum": 80 },
+        "aspect": { "type": "string", "enum": ["9:16", "16:9", "1:1", "4:5"] }
+      }
+    },
+    "scene": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "from", "to", "slot"],
+      "properties": {
+        "id": { "type": "string" },
+        "from": { "type": "number", "minimum": 0 },
+        "to": { "type": "number", "minimum": 0.1 },
+        "slot": { "type": "string" },
+        "animation": {
+          "type": "string",
+          "enum": ["none", "fade", "zoom", "slide", "kenburns"]
+        }
+      }
+    }
+  }
+}
